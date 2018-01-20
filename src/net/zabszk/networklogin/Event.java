@@ -44,7 +44,7 @@ public class Event implements Listener {
         }
         String[] args = e.getMessage().substring(command.length()).split(" ");
 
-        if (!(command.equalsIgnoreCase("login") || command.equalsIgnoreCase("l") || command.equalsIgnoreCase("signin"))) {
+        if (command.equalsIgnoreCase("login") || command.equalsIgnoreCase("l") || command.equalsIgnoreCase("signin")) {
             e.setCancelled(true);
             if (args.length == 1) {
                 if (Main.getInstance().IsAuthenticated(e.getPlayer(), false))
@@ -77,13 +77,15 @@ public class Event implements Listener {
                     e.getPlayer().sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] You don't have permissions to force authenticate.");
             } else e.getPlayer().sendMessage(ChatColor.RED + "Syntax: /login password OR /login -f username");
         } else {
-            List<String> cmds = new ArrayList();
-            cmds = Main.getInstance().config.getStringList("CommandsAllowedForNotAuthenticated");
-            for (String cmd : cmds) {
-                if (cmd.equalsIgnoreCase(command)) return;
+            if (!Main.getInstance().IsAuthenticated(e.getPlayer(), false)) {
+                List<String> cmds = new ArrayList();
+                cmds = Main.getInstance().config.getStringList("CommandsAllowedForNotAuthenticated");
+                for (String cmd : cmds) {
+                    if (cmd.equalsIgnoreCase(command)) return;
+                }
+                e.setCancelled(true);
+                Main.getInstance().SendReminder(e.getPlayer());
             }
-            e.setCancelled(true);
-            Main.getInstance().SendReminder(e.getPlayer());
         }
     }
 

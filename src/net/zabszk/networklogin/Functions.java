@@ -78,6 +78,7 @@ public class Functions {
 
     private static String MakeQuery(String username, String password) {
         try {
+            String response = "";
             String httpsURL = Main.getInstance().config.getString("AuthenticationURL");
 
             String query = "username=" + URLEncoder.encode(username, "UTF-8");
@@ -104,10 +105,10 @@ public class Functions {
             DataInputStream input = new DataInputStream(con.getInputStream());
 
             for (int c = input.read(); c != -1; c = input.read())
-                System.out.print((char) c);
+                response += ((char) c);
             input.close();
 
-            return con.getResponseMessage();
+            return response;
         } catch (Exception e) {
             System.out.println("[Zabszk NetworkLogin] Can't connect to authentication server!");
             e.printStackTrace();
