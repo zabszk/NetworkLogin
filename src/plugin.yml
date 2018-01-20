@@ -1,5 +1,5 @@
 name: NetworkLogin
-main: zabszk.networklogin.Main
+main: net.zabszk.networklogin.Main
 description: Zabszk Network Login Client
 version: 1.0
 author: zabszk
