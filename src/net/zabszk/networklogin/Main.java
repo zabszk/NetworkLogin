@@ -18,8 +18,7 @@ public class Main extends JavaPlugin {
     Event event;
     FileConfiguration config;
 
-    public void onEnable()
-    {
+    public void onEnable() {
         System.out.println("[Zabszk NetworkLogin] Activating the plugin...");
 
         instance = this;
@@ -27,6 +26,8 @@ public class Main extends JavaPlugin {
         config = getConfig();
         config.addDefault("AuthenticationURL", "https://someserver.example/authenticateMyBB.php");
         config.addDefault("ServerToken", "");
+        config.addDefault("CheckForRegistrationOnJoin", true);
+        config.addDefault("KickWhenPreauthFailsToConnect", true);
         config.addDefault("SignInMessage", "&4Please log in using: /login YourPassword");
         config.addDefault("AuthenticatedMessage", "&aYou are now logged in.");
         config.addDefault("LoggedOutMessage", "&eYou are now logged out.");
@@ -49,50 +50,45 @@ public class Main extends JavaPlugin {
         System.out.println("[Zabszk NetworkLogin] Plugin enabled.");
     }
 
-    public void onDisable()
-    {
+    public void onDisable() {
         System.out.println("[Zabszk NetworkLogin] Deactivating the plugin...");
         Authenticated.clear();
         System.out.println("[Zabszk NetworkLogin] All players has been logged out.");
         System.out.println("[Zabszk NetworkLogin] Plugin disabled.");
     }
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
-    {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("login") && sender.equals(Bukkit.getConsoleSender())) {
             try {
                 Player tr = Bukkit.getPlayer(args[0]);
-                if (tr == null || !tr.isOnline()){
+                if (tr == null || !tr.isOnline()) {
                     sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline.");
                     return true;
                 }
                 System.out.println("[Zabszk NetworkLogin] Player " + tr.getName() + " has been forced authenticated by CONSOLE.");
                 Main.getInstance().SetAuthenticated(tr, true);
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline or error occurred.");
             }
         } else if (cmd.getName().equalsIgnoreCase("logout")) {
             if (args.length == 0) {
                 if (sender instanceof Player) SetAuthenticated((Player) sender, false);
                 else sender.sendMessage(ChatColor.RED + "Please use: /logout nickname");
-            }
-            else {
+            } else {
                 if (sender.equals(Bukkit.getConsoleSender()) || (sender.hasPermission("networklogin.forcelogin") && sender.isOp())) {
                     try {
                         Player tr = Bukkit.getPlayer(args[0]);
-                        if (tr == null || !tr.isOnline()){
+                        if (tr == null || !tr.isOnline()) {
                             sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline.");
                             return true;
                         }
                         System.out.println("[Zabszk NetworkLogin] Player " + tr.getName() + " has been forced logged out by " + sender.getName());
                         Main.getInstance().SetAuthenticated(tr, false);
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline or error occurred.");
                     }
-                }
-                else sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] You don't have permissions to force logout.");
+                } else
+                    sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] You don't have permissions to force logout.");
             }
         }
         return true;
@@ -102,11 +98,9 @@ public class Main extends JavaPlugin {
         return instance;
     }
 
-    public boolean IsAuthenticated(Player target, boolean SendReminder)
-    {
+    public boolean IsAuthenticated(Player target, boolean SendReminder) {
         if (Authenticated.contains(target.getUniqueId().toString())) return true;
-        else
-        {
+        else {
             if (SendReminder) SendReminder(target);
             return false;
         }
@@ -124,8 +118,8 @@ public class Main extends JavaPlugin {
         }
     }
 
-    public void SendReminder(Player target)
-    {
-        if (!Authenticated.contains(target.getUniqueId().toString())) target.sendMessage(Functions.getMessage("SignInMessage"));
+    public void SendReminder(Player target) {
+        if (!Authenticated.contains(target.getUniqueId().toString()))
+            target.sendMessage(Functions.getMessage("SignInMessage"));
     }
 }

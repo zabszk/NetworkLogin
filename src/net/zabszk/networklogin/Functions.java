@@ -12,10 +12,8 @@ import java.net.URLEncoder;
 import java.util.Collection;
 
 public class Functions {
-    public static Player[] getOnline()
-    {
-        try
-        {
+    public static Player[] getOnline() {
+        try {
             Collection<Player> newPlayers = (Collection<Player>) Bukkit.getOnlinePlayers();
 
             Player[] online = new Player[newPlayers.size()];
@@ -24,10 +22,8 @@ public class Functions {
 
             int counter = 0;
 
-            for (int i = 0; i < obj.length; i++)
-            {
-                if (obj[i] instanceof Player)
-                {
+            for (int i = 0; i < obj.length; i++) {
+                if (obj[i] instanceof Player) {
                     String name = obj[i].toString().substring(obj[i].toString().indexOf("{"));
                     name = name.replace("{name=", "");
                     name = name.substring(0, name.length() - 1);
@@ -37,9 +33,7 @@ public class Functions {
                 }
             }
             return online;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println("Player online ERROR");
             System.out.println(e.toString());
             e.printStackTrace();
@@ -114,8 +108,7 @@ public class Functions {
             input.close();
 
             return con.getResponseMessage();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("[Zabszk NetworkLogin] Can't connect to authentication server!");
             e.printStackTrace();
             return null;
@@ -126,12 +119,10 @@ public class Functions {
         return ChatColor.translateAlternateColorCodes('&', Main.getInstance().config.getString("AlreadyLogged"));
     }
 
-    public static void SendReminderAll()
-    {
+    public static void SendReminderAll() {
         Player[] online = getOnline();
 
-        for (int i = 0; i < online.length; i++)
-        {
+        for (int i = 0; i < online.length; i++) {
             Main.getInstance().SendReminder(online[i]);
         }
     }

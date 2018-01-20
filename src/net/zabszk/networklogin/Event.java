@@ -15,19 +15,30 @@ import java.util.List;
 
 public class Event implements Listener {
 
-    @EventHandler (priority = EventPriority.MONITOR)
-    public void onChat (AsyncPlayerChatEvent e)
-    {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onChat(AsyncPlayerChatEvent e) {
         if (!Main.getInstance().IsAuthenticated(e.getPlayer(), true)) e.setCancelled(true);
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
-    public void onCommandPreprocess (PlayerCommandPreprocessEvent e)
-    {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onLogin(PlayerLoginEvent e) {
+        if (!Main.getInstance().config.getBoolean("CheckForRegistrationOnJoin")) return;
+        System.out.println("[Zabszk NetworkLogin] Preauthenticating player " + e.getPlayer().getName() + "...");
+
+        int response = Functions.Authenticate(e.getPlayer().getName());
+        System.out.println("[Zabszk NetworkLogin] Result of preauthentication of player " + e.getPlayer().getName() + " is " + response);
+
+        if (response == 0 || response == 2) e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, Functions.getMessage("AccountNotFoundMessage"));
+        else if (response == 3) e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, Functions.getMessage("AccountInactiveMessage"));
+        else if (response == 4) e.disallow(PlayerLoginEvent.Result.KICK_BANNED, Functions.getMessage("AccountBannedMessage"));
+        else if (Main.getInstance().config.getBoolean("KickWhenPreauthFailsToConnect")) e.disallow(PlayerLoginEvent.Result.KICK_OTHER, Functions.getMessage("InternalErrorMessage"));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onCommandPreprocess(PlayerCommandPreprocessEvent e) {
         String command = e.getMessage();
 
-        if (command.length() > 1)
-        {
+        if (command.length() > 1) {
             command = command.substring(1);
             if (command.contains(" ")) command = command.substring(0, command.indexOf(" "));
         }
@@ -49,24 +60,22 @@ public class Event implements Listener {
                 else if (response == 3) e.getPlayer().sendMessage(Functions.getMessage("AccountInactiveMessage"));
                 else if (response == 4) e.getPlayer().sendMessage(Functions.getMessage("AccountBannedMessage"));
                 else e.getPlayer().sendMessage(Functions.getMessage("InternalErrorMessage"));
-            }
-            else if (args.length == 2 && args[0].equalsIgnoreCase("-f")) {
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("-f")) {
                 if (e.getPlayer().hasPermission("networklogin.forcelogin") && e.getPlayer().isOp()) {
                     try {
                         Player tr = Bukkit.getPlayer(args[1]);
-                        if (tr == null || !tr.isOnline()){
+                        if (tr == null || !tr.isOnline()) {
                             e.getPlayer().sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline.");
                             return;
                         }
                         System.out.println("[Zabszk NetworkLogin] Player " + tr.getName() + " has been forced authenticated by " + e.getPlayer().getName());
                         Main.getInstance().SetAuthenticated(tr, true);
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         e.getPlayer().sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline or error occurred.");
                     }
-                } else e.getPlayer().sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] You don't have permissions to force authenticate.");
-            }
-            else e.getPlayer().sendMessage(ChatColor.RED + "Syntax: /login password OR /login -f username");
+                } else
+                    e.getPlayer().sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] You don't have permissions to force authenticate.");
+            } else e.getPlayer().sendMessage(ChatColor.RED + "Syntax: /login password OR /login -f username");
         } else {
             List<String> cmds = new ArrayList();
             cmds = Main.getInstance().config.getStringList("CommandsAllowedForNotAuthenticated");
@@ -78,45 +87,38 @@ public class Event implements Listener {
         }
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
-    public void onQuit (PlayerQuitEvent e)
-    {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onQuit(PlayerQuitEvent e) {
         Main.getInstance().SetAuthenticated(e.getPlayer(), false);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onMove (PlayerMoveEvent e)
-    {
+    public void onMove(PlayerMoveEvent e) {
         if (!Main.getInstance().IsAuthenticated(e.getPlayer(), true)) e.getPlayer().teleport(e.getFrom());
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
-    public void onItemDrop (PlayerDropItemEvent e)
-    {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onItemDrop(PlayerDropItemEvent e) {
         if (!Main.getInstance().IsAuthenticated(e.getPlayer(), true)) e.setCancelled(true);
     }
 
-    @EventHandler (priority = EventPriority.HIGH)
-    public void onItemPickup (PlayerPickupItemEvent e)
-    {
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onItemPickup(PlayerPickupItemEvent e) {
         if (!Main.getInstance().IsAuthenticated(e.getPlayer(), true)) e.setCancelled(true);
     }
 
-    @EventHandler (priority = EventPriority.HIGH)
-    public void onBlockBreak (BlockBreakEvent e)
-    {
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onBlockBreak(BlockBreakEvent e) {
         if (!Main.getInstance().IsAuthenticated(e.getPlayer(), true)) e.setCancelled(true);
     }
 
-    @EventHandler (priority = EventPriority.HIGH)
-    public void onBlockPleace (BlockPlaceEvent e)
-    {
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onBlockPleace(BlockPlaceEvent e) {
         if (!Main.getInstance().IsAuthenticated(e.getPlayer(), true)) e.setCancelled(true);
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
-    public void onInteract (PlayerInteractEvent e)
-    {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onInteract(PlayerInteractEvent e) {
         if (!Main.getInstance().IsAuthenticated(e.getPlayer(), true)) e.setCancelled(true);
     }
 }
