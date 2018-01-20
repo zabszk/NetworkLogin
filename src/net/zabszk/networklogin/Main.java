@@ -1,6 +1,9 @@
 package net.zabszk.networklogin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -52,6 +55,47 @@ public class Main extends JavaPlugin {
         Authenticated.clear();
         System.out.println("[Zabszk NetworkLogin] All players has been logged out.");
         System.out.println("[Zabszk NetworkLogin] Plugin disabled.");
+    }
+
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
+    {
+        if (cmd.getName().equalsIgnoreCase("login") && sender.equals(Bukkit.getConsoleSender())) {
+            try {
+                Player tr = Bukkit.getPlayer(args[0]);
+                if (tr == null || !tr.isOnline()){
+                    sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline.");
+                    return true;
+                }
+                System.out.println("[Zabszk NetworkLogin] Player " + tr.getName() + " has been forced authenticated by CONSOLE.");
+                Main.getInstance().SetAuthenticated(tr, true);
+            }
+            catch (Exception ex) {
+                sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline or error occurred.");
+            }
+        } else if (cmd.getName().equalsIgnoreCase("logout")) {
+            if (args.length == 0) {
+                if (sender instanceof Player) SetAuthenticated((Player) sender, false);
+                else sender.sendMessage(ChatColor.RED + "Please use: /logout nickname");
+            }
+            else {
+                if (sender.equals(Bukkit.getConsoleSender()) || (sender.hasPermission("networklogin.forcelogin") && sender.isOp())) {
+                    try {
+                        Player tr = Bukkit.getPlayer(args[0]);
+                        if (tr == null || !tr.isOnline()){
+                            sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline.");
+                            return true;
+                        }
+                        System.out.println("[Zabszk NetworkLogin] Player " + tr.getName() + " has been forced logged out by " + sender.getName());
+                        Main.getInstance().SetAuthenticated(tr, false);
+                    }
+                    catch (Exception ex) {
+                        sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline or error occurred.");
+                    }
+                }
+                else sender.sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] You don't have permissions to force logout.");
+            }
+        }
+        return true;
     }
 
     public static Main getInstance() {

@@ -58,7 +58,7 @@ public class Event implements Listener {
                             e.getPlayer().sendMessage(ChatColor.RED + "[Zabszk NetworkLogin] Player " + args[1] + " is offline.");
                             return;
                         }
-                        System.out.println("[Zabszk NetworkLogin] Player " + tr.getName() + " has been forced authenticated by " + e.getPlayer());
+                        System.out.println("[Zabszk NetworkLogin] Player " + tr.getName() + " has been forced authenticated by " + e.getPlayer().getName());
                         Main.getInstance().SetAuthenticated(tr, true);
                     }
                     catch (Exception ex) {
