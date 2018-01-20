@@ -117,7 +117,7 @@ public class Functions {
     }
 
     public static String getMessage(String key) {
-        return ChatColor.translateAlternateColorCodes('&', Main.getInstance().config.getString("AlreadyLogged"));
+        return ChatColor.translateAlternateColorCodes('&', Main.getInstance().config.getString(key));
     }
 
     public static void SendReminderAll() {
