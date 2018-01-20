@@ -42,7 +42,9 @@ public class Event implements Listener {
             command = command.substring(1);
             if (command.contains(" ")) command = command.substring(0, command.indexOf(" "));
         }
-        String[] args = e.getMessage().substring(command.length()).split(" ");
+        String[] args;
+        if (e.getMessage().contains(" ")) args = e.getMessage().substring(command.length() + 1).split(" ");
+        else args = new String[0];
 
         if (command.equalsIgnoreCase("login") || command.equalsIgnoreCase("l") || command.equalsIgnoreCase("signin")) {
             e.setCancelled(true);
@@ -61,7 +63,7 @@ public class Event implements Listener {
                 else if (response == 4) e.getPlayer().sendMessage(Functions.getMessage("AccountBannedMessage"));
                 else e.getPlayer().sendMessage(Functions.getMessage("InternalErrorMessage"));
             } else if (args.length == 2 && args[0].equalsIgnoreCase("-f")) {
-                if (e.getPlayer().hasPermission("networklogin.forcelogin") && e.getPlayer().isOp()) {
+                if (e.getPlayer().hasPermission("networklogin.forcelogin") && e.getPlayer().isOp() && Main.getInstance().IsAuthenticated(e.getPlayer(), true)) {
                     try {
                         Player tr = Bukkit.getPlayer(args[1]);
                         if (tr == null || !tr.isOnline()) {
