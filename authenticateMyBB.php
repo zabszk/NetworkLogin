@@ -4,13 +4,13 @@
 
 $servertoken = ""; //set LONG random token here
 
-//Mozesz zaznaczyc wiele, jesli czesc userow uzywa starego hashowania
+//You can select multiple hashing methods - if some users are using different hashing algorithm
 $checkMD5 = true;
 $checkSHA512_bcrypt = true;
-//MD5 - defaulotwe hashowanie MD5
-//sha512_bcrypt - wymagane: https://github.com/dvz/mybb-dvzHash
+//MD5 - default MyBB hashing, MD5
+//sha512_bcrypt - hashing of https://github.com/dvz/mybb-dvzHash
 
-$nonactivegroup = 5; //Grupa nieaktywowanych kont, ustaw na -1, aby wyłączyc sprawdzanie
+$nonactivegroup = 5; //Group for not activated accounts, -1 to disable
 if (empty($_POST['username']) || empty($_POST['token'])) die('Missing data');
 if ($_POST['token'] != $servertoken) die('Invalid token');
 require_once('../forum/inc/config.php'); //path to MyBB config
